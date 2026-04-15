@@ -82,291 +82,93 @@
 
 ## 🚀 Get Started
 
+For the full local development, Docker deployment, environment variable, and
+troubleshooting guide, see
+[Local Development and Deployment](docs/local-development-and-deployment.md).
+
 ### Option A — Setup Tour (Recommended)
 
-A **single interactive script** that walks you through everything: dependency installation, environment configuration, live connection testing, and launch. No manual `.env` editing needed.
+A single interactive script installs dependencies, helps configure providers, and
+launches DeepTutor.
 
 ```bash
 git clone https://github.com/HKUDS/DeepTutor.git
 cd DeepTutor
-
-# Create a Python environment
-conda create -n deeptutor python=3.11 && conda activate deeptutor
-# Or: python -m venv .venv && source .venv/bin/activate
-
-# Launch the guided tour
 python scripts/start_tour.py
 ```
 
-The tour asks how you'd like to use DeepTutor:
+The tour supports:
 
-- **Web mode** (recommended) — Picks a dependency profile, installs everything (pip + npm), then spins up a temporary server and opens the **Settings** page in your browser. A four-step guided tour walks you through LLM, Embedding, and Search provider setup with live connection testing. Once complete, DeepTutor restarts automatically with your configuration.
-- **CLI mode** — A fully interactive terminal flow: choose a dependency profile, install dependencies, configure providers, verify connections, and apply — all without leaving the shell.
+- **Web mode** for browser-based setup and launch
+- **CLI mode** for terminal-based setup and launch
 
-Either way, you end up with a running DeepTutor at [http://localhost:3782](http://localhost:3782).
+DeepTutor runs at [http://localhost:3782](http://localhost:3782).
 
-### Option B — Manual Local Install
+### Option B — Manual Local Start
 
-If you prefer full control, install and configure everything yourself.
-
-**1. Install dependencies**
+Recommended for contributors who want a transparent backend + frontend workflow.
 
 ```bash
 git clone https://github.com/HKUDS/DeepTutor.git
 cd DeepTutor
-
-conda create -n deeptutor python=3.11 && conda activate deeptutor
 pip install -e ".[server]"
-
-# Frontend
 cd web && npm install && cd ..
 ```
 
-**2. Configure environment**
+Create `.env` from `.env.example` and set the required LLM and embedding values.
+
+Start the backend:
 
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` and fill in at least the required fields:
-
-```dotenv
-# LLM (Required)
-LLM_BINDING=openai
-LLM_MODEL=gpt-4o-mini
-LLM_API_KEY=sk-xxx
-LLM_HOST=https://api.openai.com/v1
-
-# Embedding (Required for Knowledge Base)
-EMBEDDING_BINDING=openai
-EMBEDDING_MODEL=text-embedding-3-large
-EMBEDDING_API_KEY=sk-xxx
-EMBEDDING_HOST=https://api.openai.com/v1
-EMBEDDING_DIMENSION=3072
-```
-
-<details>
-<summary><b>Supported LLM Providers</b></summary>
-
-| Provider | Binding | Default Base URL |
-|:--|:--|:--|
-| AiHubMix | `aihubmix` | `https://aihubmix.com/v1` |
-| Anthropic | `anthropic` | `https://api.anthropic.com/v1` |
-| Azure OpenAI | `azure_openai` | — |
-| BytePlus | `byteplus` | `https://ark.ap-southeast.bytepluses.com/api/v3` |
-| BytePlus Coding Plan | `byteplus_coding_plan` | `https://ark.ap-southeast.bytepluses.com/api/coding/v3` |
-| Custom (OpenAI-compat) | `custom` | — |
-| DashScope (Qwen) | `dashscope` | `https://dashscope.aliyuncs.com/compatible-mode/v1` |
-| DeepSeek | `deepseek` | `https://api.deepseek.com` |
-| Gemini | `gemini` | `https://generativelanguage.googleapis.com/v1beta/openai/` |
-| GitHub Copilot | `github_copilot` | `https://api.githubcopilot.com` |
-| Groq | `groq` | `https://api.groq.com/openai/v1` |
-| llama.cpp | `llama_cpp` | `http://localhost:8080/v1` |
-| LM Studio | `lm_studio` | `http://localhost:1234/v1` |
-| MiniMax | `minimax` | `https://api.minimax.io/v1` |
-| Mistral | `mistral` | `https://api.mistral.ai/v1` |
-| Moonshot (Kimi) | `moonshot` | `https://api.moonshot.ai/v1` |
-| Ollama | `ollama` | `http://localhost:11434/v1` |
-| OpenAI | `openai` | `https://api.openai.com/v1` |
-| OpenAI Codex | `openai_codex` | `https://chatgpt.com/backend-api` |
-| OpenRouter | `openrouter` | `https://openrouter.ai/api/v1` |
-| OpenVINO Model Server | `ovms` | `http://localhost:8000/v3` |
-| Qianfan (Ernie) | `qianfan` | `https://qianfan.baidubce.com/v2` |
-| SiliconFlow | `siliconflow` | `https://api.siliconflow.cn/v1` |
-| Step Fun | `stepfun` | `https://api.stepfun.com/v1` |
-| vLLM | `vllm` | `http://localhost:8000/v1` |
-| VolcEngine | `volcengine` | `https://ark.cn-beijing.volces.com/api/v3` |
-| VolcEngine Coding Plan | `volcengine_coding_plan` | `https://ark.cn-beijing.volces.com/api/coding/v3` |
-| Xiaomi MIMO | `xiaomi_mimo` | `https://api.xiaomimimo.com/v1` |
-| Zhipu AI (GLM) | `zhipu` | `https://open.bigmodel.cn/api/paas/v4` |
-
-</details>
-
-<details>
-<summary><b>Supported Embedding Providers</b></summary>
-
-Embedding uses the same provider list as LLM. Common choices:
-
-| Provider | Binding | Model Example |
-|:--|:--|:--|
-| OpenAI | `openai` | `text-embedding-3-large` |
-| DashScope | `dashscope` | `text-embedding-v3` |
-| Ollama | `ollama` | `nomic-embed-text` |
-| LM Studio | `lm_studio` | Any embedding model |
-| SiliconFlow | `siliconflow` | `BAAI/bge-m3` |
-| vLLM | `vllm` | Any embedding model |
-| Any OpenAI-compatible | `custom` | — |
-
-</details>
-
-<details>
-<summary><b>Supported Web Search Providers</b></summary>
-
-| Provider | Env Key | Notes |
-|:--|:--|:--|
-| Brave | `BRAVE_API_KEY` | Recommended, free tier available |
-| Tavily | `TAVILY_API_KEY` | |
-| Jina | `JINA_API_KEY` | |
-| SearXNG | — | Self-hosted, no API key needed |
-| DuckDuckGo | — | No API key needed |
-| Perplexity | `PERPLEXITY_API_KEY` | Requires API key |
-
-</details>
-
-**3. Start services**
-
-```bash
-# Backend (FastAPI)
 python -m deeptutor.api.run_server
-
-# Frontend (Next.js) — in a separate terminal
-cd web && npm run dev -- -p 3782
 ```
 
-| Service | Default Port |
-|:---:|:---:|
-| Backend | `8001` |
-| Frontend | `3782` |
+Start the frontend in a second terminal with `NEXT_PUBLIC_API_BASE` pointing to the
+backend. See the full guide for PowerShell, bash, and `web/.env.local` examples.
 
-Open [http://localhost:3782](http://localhost:3782) and you're ready to go.
+Default ports:
+
+- Backend: `8001`
+- Frontend: `3782`
 
 ### Option C — Docker Deployment
 
-Docker wraps the backend and frontend into a single container — no local Python or Node.js required. Two options depending on your preference:
-
-**1. Configure environment variables** (required for both options)
+Recommended for Linux servers and clean local container runs.
 
 ```bash
-git clone https://github.com/HKUDS/DeepTutor.git
-cd DeepTutor
 cp .env.example .env
-```
-
-Edit `.env` and fill in at least the required fields (same as [Option B](#option-b--manual-local-install) above).
-
-**2a. Pull official image (recommended)**
-
-Official images are published to [GitHub Container Registry](https://github.com/HKUDS/DeepTutor/pkgs/container/deeptutor) on every release, built for `linux/amd64` and `linux/arm64`.
-
-```bash
 docker compose -f docker-compose.ghcr.yml up -d
 ```
 
-To pin a specific version, edit the image tag in `docker-compose.ghcr.yml`:
-
-```yaml
-image: ghcr.io/hkuds/deeptutor:1.0.0  # or :latest
-```
-
-**2b. Build from source**
+For source builds:
 
 ```bash
 docker compose up -d
 ```
 
-This builds the image locally from `Dockerfile` and starts the container.
-
-**3. Verify & manage**
-
-Open [http://localhost:3782](http://localhost:3782) once the container is healthy.
-
-```bash
-docker compose logs -f   # tail logs
-docker compose down       # stop and remove container
-```
-
-<details>
-<summary><b>Cloud / remote server deployment</b></summary>
-
-When deploying to a remote server, the browser needs to know the public URL of the backend API. Add one more variable to your `.env`:
-
-```dotenv
-# Set to the public URL where the backend is reachable
-NEXT_PUBLIC_API_BASE_EXTERNAL=https://your-server.com:8001
-```
-
-The frontend startup script applies this value at runtime — no rebuild needed.
-
-</details>
-
-<details>
-<summary><b>Development mode (hot-reload)</b></summary>
-
-Layer the dev override to mount source code and enable hot-reload for both services:
+For hot-reload Docker development:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
-Changes to `deeptutor/`, `deeptutor_cli/`, `scripts/`, and `web/` are reflected immediately.
+The full guide covers:
 
-</details>
-
-<details>
-<summary><b>Custom ports</b></summary>
-
-Override the default ports in `.env`:
-
-```dotenv
-BACKEND_PORT=9001
-FRONTEND_PORT=4000
-```
-
-Then restart:
-
-```bash
-docker compose up -d     # or docker compose -f docker-compose.ghcr.yml up -d
-```
-
-</details>
-
-<details>
-<summary><b>Data persistence</b></summary>
-
-User data and knowledge bases are persisted via Docker volumes mapped to local directories:
-
-| Container path | Host path | Content |
-|:---|:---|:---|
-| `/app/data/user` | `./data/user` | Settings, memory, workspace, sessions, logs |
-| `/app/data/knowledge_bases` | `./data/knowledge_bases` | Uploaded documents & vector indices |
-
-These directories survive `docker compose down` and are reused on the next `docker compose up`.
-
-</details>
-
-<details>
-<summary><b>Environment variables reference</b></summary>
-
-| Variable | Required | Description |
-|:---|:---:|:---|
-| `LLM_BINDING` | **Yes** | LLM provider (`openai`, `anthropic`, etc.) |
-| `LLM_MODEL` | **Yes** | Model name (e.g. `gpt-4o`) |
-| `LLM_API_KEY` | **Yes** | Your LLM API key |
-| `LLM_HOST` | **Yes** | API endpoint URL |
-| `EMBEDDING_BINDING` | **Yes** | Embedding provider |
-| `EMBEDDING_MODEL` | **Yes** | Embedding model name |
-| `EMBEDDING_API_KEY` | **Yes** | Embedding API key |
-| `EMBEDDING_HOST` | **Yes** | Embedding endpoint |
-| `EMBEDDING_DIMENSION` | **Yes** | Vector dimension |
-| `SEARCH_PROVIDER` | No | Search provider (`tavily`, `jina`, `serper`, `perplexity`, etc.) |
-| `SEARCH_API_KEY` | No | Search API key |
-| `BACKEND_PORT` | No | Backend port (default `8001`) |
-| `FRONTEND_PORT` | No | Frontend port (default `3782`) |
-| `NEXT_PUBLIC_API_BASE_EXTERNAL` | No | Public backend URL for cloud deployment |
-| `DISABLE_SSL_VERIFY` | No | Disable SSL verification (default `false`) |
-
-</details>
+- `NEXT_PUBLIC_API_BASE_EXTERNAL` for remote deployment
+- custom ports
+- persistence directories
+- common Docker troubleshooting
 
 ### Option D — CLI Only
 
-If you just want the CLI without the web frontend:
+If you only need the CLI:
 
 ```bash
 pip install -e ".[cli]"
-deeptutor chat                                   # Interactive REPL
-deeptutor run chat "Explain Fourier transform"   # One-shot capability
-deeptutor run deep_solve "Solve x^2 = 4"         # Multi-agent problem solving
-deeptutor kb create my-kb --doc textbook.pdf     # Build a knowledge base
+deeptutor chat
+deeptutor run chat "Explain Fourier transform"
+deeptutor run deep_solve "Solve x^2 = 4"
+deeptutor kb create my-kb --doc textbook.pdf
 ```
 
 > See [DeepTutor CLI](#%EF%B8%8F-deeptutor-cli--agent-native-interface) for the full feature guide and command reference.
